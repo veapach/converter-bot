@@ -4,6 +4,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 def main_menu() -> InlineKeyboardMarkup:
     kb = [
         [InlineKeyboardButton(text="🎬 Конвертировать видео", callback_data="convert")],
+        [InlineKeyboardButton(text="📱 TikTok редактор", callback_data="tiktok_editor")],
         [InlineKeyboardButton(text="⚙️ Настройки", callback_data="settings")],
     ]
     return InlineKeyboardMarkup(inline_keyboard=kb)
@@ -50,3 +51,84 @@ def crf_menu() -> InlineKeyboardMarkup:
     rows = [[InlineKeyboardButton(text=v, callback_data=f"crf:{v}")] for v in values]
     rows.append([InlineKeyboardButton(text="Назад", callback_data="settings")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def crop_edit_menu(settings) -> InlineKeyboardMarkup:
+    """Клавиатура для редактирования кропа"""
+    kb = [
+        [
+            InlineKeyboardButton(text="⬆️", callback_data="crop_move:up"),
+        ],
+        [
+            InlineKeyboardButton(text="⬅️", callback_data="crop_move:left"),
+            InlineKeyboardButton(text="➡️", callback_data="crop_move:right"),
+        ],
+        [
+            InlineKeyboardButton(text="⬇️", callback_data="crop_move:down"),
+        ],
+        [
+            InlineKeyboardButton(text=f"Размер: {settings.width}x{settings.height}", callback_data="crop_size"),
+        ],
+        [
+            InlineKeyboardButton(text="✅ Далее", callback_data="crop_next"),
+            InlineKeyboardButton(text="🔙 Назад", callback_data="crop_back_to_main"),
+        ],
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=kb)
+
+
+def crop_size_menu() -> InlineKeyboardMarkup:
+    """Клавиатура выбора размера кропа"""
+    sizes = ["512x512", "640x640", "720x720", "480x480"]
+    rows = [[InlineKeyboardButton(text=s, callback_data=f"crop_size_set:{s}")] for s in sizes]
+    rows.append([InlineKeyboardButton(text="🔙 Назад", callback_data="crop_back")])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def time_edit_menu(start_time: float, duration: float, max_duration: float) -> InlineKeyboardMarkup:
+    """Клавиатура для редактирования временного отрезка"""
+    kb = [
+        [
+            InlineKeyboardButton(text="Начало отрезка", callback_data="ignore"),
+        ],
+        [
+            InlineKeyboardButton(text="⏪⏪", callback_data="time_start:left_fast"),
+            InlineKeyboardButton(text="⏪", callback_data="time_start:left"),
+            InlineKeyboardButton(text="⏩", callback_data="time_start:right"),
+            InlineKeyboardButton(text="⏩⏩", callback_data="time_start:right_fast"),
+        ],
+        [
+            InlineKeyboardButton(text="Конец отрезка", callback_data="ignore"),
+        ],
+        [
+            InlineKeyboardButton(text="⏪⏪", callback_data="time_end:left_fast"),
+            InlineKeyboardButton(text="⏪", callback_data="time_end:left"),
+            InlineKeyboardButton(text="⏩", callback_data="time_end:right"),
+            InlineKeyboardButton(text="⏩⏩", callback_data="time_end:right_fast"),
+        ],
+        [
+            InlineKeyboardButton(text=f"⏱ {start_time:.1f}s - {start_time + duration:.1f}s", callback_data="time_info"),
+        ],
+        [
+            InlineKeyboardButton(text="✅ Готово", callback_data="time_done"),
+            InlineKeyboardButton(text="🔙 Назад", callback_data="time_back"),
+        ],
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=kb)
+
+
+def preview_menu() -> InlineKeyboardMarkup:
+    """Клавиатура для предпросмотра результата"""
+    kb = [
+        [
+            InlineKeyboardButton(text="✅ Конвертировать", callback_data="preview_convert"),
+        ],
+        [
+            InlineKeyboardButton(text="✂️ Редактировать кроп", callback_data="preview_edit_crop"),
+            InlineKeyboardButton(text="⏰ Редактировать время", callback_data="preview_edit_time"),
+        ],
+        [
+            InlineKeyboardButton(text="🔙 Назад в меню", callback_data="tiktok_back_main"),
+        ],
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=kb)

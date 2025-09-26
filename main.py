@@ -8,6 +8,7 @@ from app.config import Config
 from app.handlers.start import router as start_router
 from app.handlers.settings import router as settings_router
 from app.handlers.video import router as video_router
+from app.handlers.tiktok import router as tiktok_router
 
 
 async def main() -> None:
@@ -16,6 +17,7 @@ async def main() -> None:
 	bot = Bot(token=cfg.bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 	dp = Dispatcher(storage=MemoryStorage())
 	dp.include_router(start_router)
+	dp.include_router(tiktok_router)
 	dp.include_router(settings_router)
 	dp.include_router(video_router)
 	await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())

@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  converter-bot:
+    build: .
+    container_name: tiktok-converter-bot
+    restart: unless-stopped
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./logs:/app/logs
+      - /tmp/tiktok_temp:/tmp/tiktok_downloads
+    networks:
+      - bot-network
+    # Если нужны веб-хуки, раскомментируй:
+    # ports:
+    #   - "8000:8000"
+
+networks:
+  bot-network:
+    driver: bridge
+
+volumes:
+  bot-data:

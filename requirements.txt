@@ -1,0 +1,6 @@
+aiogram==3.13.1
+python-dotenv==1.0.1
+yt-dlp==2024.9.27
+Pillow==10.4.0
+opencv-python-headless==4.10.0.84
+aiofiles==24.1.0
