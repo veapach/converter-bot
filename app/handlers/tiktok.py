@@ -58,6 +58,11 @@ async def handle_tiktok_url_direct(message: Message, state: FSMContext):
     if not message.text:
         return
     
+    # Проверяем, не находимся ли мы в состоянии ожидания URL в редакторе
+    current_state = await state.get_state()
+    if current_state == TikTokEditStates.waiting_url:
+        return  # Пропускаем, пусть обрабатывает специфичный обработчик
+    
     url = message.text.strip()
     
     if not TIKTOK_URL_PATTERN.match(url):
@@ -573,8 +578,13 @@ async def handle_tiktok_back_to_main(cb: CallbackQuery, state: FSMContext):
     # Очищаем все служебные сообщения
     await cleanup_messages(state, cb.bot)
     
+    # Убеждаемся, что настройки загружены
+    if not settings:
+        settings = Settings.from_defaults(Config.load().defaults)
+        await state.update_data(settings=settings)
+    
     # Изменяем текущее сообщение на главное меню вместо удаления
-    if settings:
+    try:
         await cb.message.edit_text(
             format_main_menu_text(settings),
             reply_markup=main_menu(),
@@ -583,6 +593,17 @@ async def handle_tiktok_back_to_main(cb: CallbackQuery, state: FSMContext):
         await state.update_data(
             menu_message_id=cb.message.message_id,
             chat_id=cb.message.chat.id
+        )
+    except Exception:
+        # Если не удалось редактировать, создаем новое сообщение
+        new_menu = await cb.message.answer(
+            format_main_menu_text(settings),
+            reply_markup=main_menu(),
+            parse_mode="HTML"
+        )
+        await state.update_data(
+            menu_message_id=new_menu.message_id,
+            chat_id=new_menu.chat.id
         )
     
     await state.clear()

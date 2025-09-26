@@ -63,11 +63,23 @@ async def back_main(cb: CallbackQuery, state: FSMContext):
     if not settings:
         settings = Settings.from_defaults(Config.load().defaults)
         await state.update_data(settings=settings)
-    await cb.message.edit_text(
-        format_main_menu_text(settings), reply_markup=main_menu(), parse_mode="HTML"
-    )
-    await state.update_data(
-        menu_message_id=cb.message.message_id, chat_id=cb.message.chat.id
-    )
+
+    # Пытаемся редактировать сообщение, если не получается - создаем новое
+    try:
+        await cb.message.edit_text(
+            format_main_menu_text(settings), reply_markup=main_menu(), parse_mode="HTML"
+        )
+        await state.update_data(
+            menu_message_id=cb.message.message_id, chat_id=cb.message.chat.id
+        )
+    except Exception:
+        # Если не удалось редактировать (сообщение не найдено), создаем новое
+        new_menu = await cb.message.answer(
+            format_main_menu_text(settings), reply_markup=main_menu(), parse_mode="HTML"
+        )
+        await state.update_data(
+            menu_message_id=new_menu.message_id, chat_id=new_menu.chat.id
+        )
+
     await state.clear()  # Очищаем состояние при возврате в главное меню
     await cb.answer()
